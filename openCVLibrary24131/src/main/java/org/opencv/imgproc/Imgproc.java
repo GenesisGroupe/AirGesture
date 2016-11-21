@@ -373,7 +373,6 @@ public class Imgproc {
             CV_THRESH_MASK = 7,
             CV_THRESH_OTSU = 8;
 
-
     //
     // C++:  void Canny(Mat image, Mat& edges, double threshold1, double threshold2, int apertureSize = 3, bool L2gradient = false)
     //

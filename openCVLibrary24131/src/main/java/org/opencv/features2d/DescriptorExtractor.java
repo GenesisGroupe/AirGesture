@@ -57,6 +57,7 @@ import java.util.List;
  * @see <a href="http://docs.opencv.org/modules/features2d/doc/common_interfaces_of_descriptor_extractors.html#descriptorextractor">org.opencv.features2d.DescriptorExtractor : public Algorithm</a>
  */
 public class DescriptorExtractor {
+
     public static final int
             SIFT = 1,
             SURF = 2,
