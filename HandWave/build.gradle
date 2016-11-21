@@ -9,6 +9,7 @@ android {
 
         ndk {
             moduleName "touch_free_library"
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
         }
     }
 

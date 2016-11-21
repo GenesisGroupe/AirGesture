@@ -320,12 +320,14 @@ class AsyncServiceHelper {
                     String AbsLibraryPath = Path + File.separator + splitter.nextToken();
                     result &= loadLibrary(AbsLibraryPath);
                 }
-            } else {
+            }
+            /*
+            else {
                 // If the dependencies list is not defined or empty.
                 String AbsLibraryPath = Path + File.separator + "libopencv_java3.so";
                 result &= loadLibrary(AbsLibraryPath);
             }
-
+            */
             return result;
         } else {
             Log.d(TAG, "Library path \"" + Path + "\" is empty");

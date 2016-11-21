@@ -2,6 +2,7 @@ package com.genesis.airgesture;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements CameraGestureSens
         public void onManagerConnected(int status) {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS: {
+                    setContentView(R.layout.activity_main);
                     mOpenCVInitiated = true;
                     CameraGestureSensor.loadLibrary();
                     mGestureSensor.start();     // your main gesture sensor object
@@ -39,10 +41,28 @@ public class MainActivity extends AppCompatActivity implements CameraGestureSens
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_13, this, mLoaderCallback);
         mGestureSensor.addGestureListener(this);
+
     }
+
+    public void onResume()
+    {
+        super.onResume();
+        /*
+        if (!OpenCVLoader.initDebug()) {
+            Log.d("OpenCV", "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_13, this, mLoaderCallback);
+            mGestureSensor.addGestureListener(this);
+        } else {
+            Log.d("OpenCV", "OpenCV library found inside package. Using it!");
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
+        */
+    }
+
+
 
     @Override
     public void onGestureUp(CameraGestureSensor caller, long gestureLength) {

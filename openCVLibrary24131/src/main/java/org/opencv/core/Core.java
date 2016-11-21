@@ -17,6 +17,18 @@ public class Core {
     public static final int VERSION_MAJOR = getVersionMajor();
     public static final int VERSION_MINOR = getVersionMinor();
     public static final int VERSION_REVISION = getVersionRevision();
+
+    private static final int
+            CV_8U = 0,
+            CV_8S = 1,
+            CV_16U = 2,
+            CV_16S = 3,
+            CV_32S = 4,
+            CV_32F = 5,
+            CV_64F = 6,
+            CV_USRTYPE1 = 7;
+
+
     public static final int
             SVD_MODIFY_A = 1,
             SVD_NO_UV = 2,
@@ -102,15 +114,7 @@ public class Core {
             FONT_HERSHEY_SCRIPT_SIMPLEX = 6,
             FONT_HERSHEY_SCRIPT_COMPLEX = 7,
             FONT_ITALIC = 16;
-    private static final int
-            CV_8U = 0,
-            CV_8S = 1,
-            CV_16U = 2,
-            CV_16S = 3,
-            CV_32S = 4,
-            CV_32F = 5,
-            CV_64F = 6,
-            CV_USRTYPE1 = 7;
+
 
     // these constants are wrapped inside functions to prevent inlining
     private static String getVersion() {

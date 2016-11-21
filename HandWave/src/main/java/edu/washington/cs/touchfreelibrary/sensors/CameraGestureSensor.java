@@ -339,7 +339,12 @@ public class CameraGestureSensor extends ClickSensor {
      * OpenCV is initiated.
      */
     static public void loadLibrary() {
-        System.loadLibrary("touch_free_library");
+        try {
+            System.loadLibrary("touch_free_library");
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //Adding capability to try and see if we can differentiate clicks from gestures
