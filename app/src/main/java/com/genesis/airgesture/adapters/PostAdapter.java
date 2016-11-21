@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.genesis.airgesture.R;
 import com.squareup.picasso.Picasso;
@@ -46,16 +47,9 @@ public class PostAdapter extends RecyclerView.Adapter {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.photo_post_cell, parent, false);
 
-/*
-        PostHolder holder = new PostHolder();
-        holder.ivPhoto = (ImageView) convertView.findViewById(R.id.photo_post_iv);
-        holder.post = (PhotoPost) getItem(position);
-        ViewHolder vh = new RecyclerView.ViewHolder(v);
-
-
-*/
         PostHolder ph = new PostHolder(v);
         ph.ivPhoto = (ImageView) v.findViewById(R.id.photo_post_iv);
+        ph.tvTitle = (TextView)  v.findViewById(R.id.photo_post_tv_title);
         return ph;
     }
 
@@ -63,7 +57,12 @@ public class PostAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         PostHolder realHolder = (PostHolder)holder;
         PhotoPost post = posts.get(position);
-        Picasso.with(realHolder.viewPost.getContext()).load(post.getPhotos().get(0).getOriginalSize().getUrl()).into(realHolder.ivPhoto);
+
+        float width = ((PostHolder) holder).viewPost.getResources().getDimension(R.dimen.photo_width);
+        float height = ((PostHolder) holder).viewPost.getResources().getDimension(R.dimen.photo_height);
+
+        Picasso.with(realHolder.viewPost.getContext()).load(post.getPhotos().get(0).getOriginalSize().getUrl()).resize((int)width, (int)height).into(realHolder.ivPhoto);
+        realHolder.tvTitle.setText("title : " + post.getSourceTitle());
     }
 
     @Override
@@ -75,6 +74,7 @@ public class PostAdapter extends RecyclerView.Adapter {
     public static class PostHolder extends  RecyclerView.ViewHolder{
         public View viewPost;
         public ImageView ivPhoto;
+        public TextView tvTitle;
 
         public PostHolder(View itemView) {
             super(itemView);

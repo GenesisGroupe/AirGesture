@@ -5,6 +5,7 @@ import android.hardware.Camera;
 import android.os.AsyncTask;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -35,6 +36,7 @@ public class MainActivity extends Activity {
     private SurfaceView cameraPreview;
 
     private Camera camera;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +47,7 @@ public class MainActivity extends Activity {
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
+        //mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
@@ -54,6 +56,7 @@ public class MainActivity extends Activity {
 
         cameraPreview = (SurfaceView) findViewById(R.id.camera_preview);
 
+        mHandler = new Handler();
 
         AsyncTask<Void, Void, ArrayList<PhotoPost>> task = new AsyncTask<Void, Void, ArrayList<PhotoPost>>() {
             @Override
@@ -62,14 +65,7 @@ public class MainActivity extends Activity {
                 JumblrClient client = new JumblrClient(consumer_key, consumer_secret);
                 client.setToken(token, token_secret);
 
-                // Write the user's name
-                User user = client.user();
-                System.out.println(user.getName());
-
                 Blog blog = client.blogInfo("theweatherlab.tumblr.com");
-                System.out.println("\t" + blog.getTitle());
-                Log.d("AirGesture", "numbers of posts : " + blog.getPostCount());
-
                 ArrayList<PhotoPost> finalArray = new ArrayList<>();
                 for (Post post : blog.posts()) {
                     if (post.getClass().equals(PhotoPost.class)){
@@ -86,7 +82,7 @@ public class MainActivity extends Activity {
                 //MainActivity.this.gvPosts.setAdapter(adapter);
                 // specify an adapter (see also next example)
                 mRecyclerView.setAdapter(adapter);
-
+                //mHandler.post(scrollRunnable);
             }
         };
 
@@ -96,85 +92,13 @@ public class MainActivity extends Activity {
     }
 
 
-    /*
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (camera != null) {
-            try {
-                camera.reconnect();
-            }
-            catch(IOException e) {
-                e.printStackTrace();;
-            }
+    private Runnable scrollRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mRecyclerView.scrollBy(0, 100);
+            mHandler.postDelayed(this, 100);
         }
-    }
+    };
 
-    @Override
-    public void onPause() {
-        super.onPause();;
-        if (camera != null) {
-            camera.release();;
-        }
-    }
-
-
-    private void setupCamera() {
-        try {
-        int cameraId = findFrontFacingCamera();
-
-        camera = Camera.open(cameraId);
-        Camera.Parameters camParams = camera.getParameters();
-
-// Find a preview size that is at least the size of our IMAGE_SIZE
-        Camera.Size previewSize = camParams.getSupportedPreviewSizes().get(0);
-        for (Camera.Size size : camParams.getSupportedPreviewSizes()) {
-            if (size.width >= IMAGE_SIZE && size.height >= IMAGE_SIZE) {
-                previewSize = size;
-                break;
-            }
-        }
-        camParams.setPreviewSize(previewSize.width, previewSize.height);
-
-// Try to find the closest picture size to match the preview size.
-        Camera.Size pictureSize = camParams.getSupportedPictureSizes().get(0);
-        for (Camera.Size size : camParams.getSupportedPictureSizes()) {
-            if (size.width == previewSize.width && size.height == previewSize.height) {
-                pictureSize = size;
-                break;
-            }
-        }
-        camParams.setPictureSize(pictureSize.width, pictureSize.height);
-        }
-        catch (RuntimeException e){
-            Toast.makeText(getBaseContext(), "Impossible d'allumer la caméra", Toast.LENGTH_LONG).show();
-            Log.e("AirGesture", "error : " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private int findFrontFacingCamera() {
-
-        // Search for the front facing camera
-        int numberOfCameras = Camera.getNumberOfCameras();
-        int cameraId = -1;
-        for (int i = 0; i < numberOfCameras; i++) {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(i, info);
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                cameraId = i;
-               break;
-            }
-        }
-        return cameraId;
-    }
-
-    */
 
 }
