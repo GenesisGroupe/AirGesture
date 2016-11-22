@@ -2,14 +2,11 @@ package com.genesis.airgesture;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.os.AsyncTask;
 
 import android.os.Bundle;
@@ -18,14 +15,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Toast;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.genesis.airgesture.adapters.PostAdapter;
@@ -33,7 +24,7 @@ import com.tumblr.jumblr.JumblrClient;
 import com.tumblr.jumblr.types.Blog;
 import com.tumblr.jumblr.types.PhotoPost;
 import com.tumblr.jumblr.types.Post;
-import com.tumblr.jumblr.types.User;
+
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
@@ -46,8 +37,9 @@ import edu.washington.cs.touchfreelibrary.sensors.CameraGestureSensor;
 
 public class MainActivity extends Activity implements CameraGestureSensor.Listener{
 
+    private static int LENGTH_CAP = 500;
     private static int IMAGE_SIZE = 1024;
-    private static int SCROLL_OFFSET = 1000;
+    private static int SCROLL_OFFSET = 10;
 
     public static  String consumer_key = "KLwOfrGQ80ZBauTPmLYbjoHAnrAwFJAjfs8Z0QjlO6qf5WpBAA";
     public static  String consumer_secret = "cCTqMq8lY69jLLvNIY6n5IWFQb8nD2hbEJA7AG8DdPQGfekgNW";
@@ -56,16 +48,16 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
 
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
-    private SurfaceView cameraPreview;
+    //private SurfaceView cameraPreview;
 
-    private Camera camera;
+
     private Handler mHandler;
-
+    private Camera camera;
     private int currentIndex = 0;
 
     private static final String TAG = "MainActivity";
     CameraGestureSensor mGestureSensor = null;
-    private JavaCameraView mCamera = null;
+    private JavaCameraView mCameraPreview = null;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -93,10 +85,9 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
                         return;
                     }
 
-                    mGestureSensor = new CameraGestureSensor(MainActivity.this);
+
                     CameraGestureSensor.loadLibrary();
-                    mGestureSensor.addGestureListener(MainActivity.this);
-                    mGestureSensor.start(mCamera);
+
                 }
                 break;
                 default:
@@ -111,9 +102,12 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.CAMERA},
                 0);
+
+        loadOpenCV();
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
         // use this setting to improve performance if you know that changes
@@ -125,8 +119,10 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
 
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        cameraPreview = (SurfaceView) findViewById(R.id.camera);
+        //cameraPreview = (SurfaceView) findViewById(R.id.camera);
+        mCameraPreview = (JavaCameraView) findViewById(R.id.camera_preview);
         setupCamera();
+
         mHandler = new Handler();
 
         AsyncTask<Void, Void, ArrayList<PhotoPost>> task = new AsyncTask<Void, Void, ArrayList<PhotoPost>>() {
@@ -160,8 +156,6 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
         task.execute();
 
 
-        retrieveControls();
-        loadOpenCV();
     }
 
 
@@ -186,8 +180,14 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
 
             return;
         }
-        cameraPreview.getHolder().addCallback(surfaceHolderCallback);
-        Camera camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+
+        mGestureSensor = new CameraGestureSensor(MainActivity.this);
+        mGestureSensor.addGestureListener(MainActivity.this);
+        mGestureSensor.start(mCameraPreview);
+
+        /*
+        //mCameraPreview.getHolder().addCallback(surfaceHolderCallback);
+        Camera camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
         Camera.Parameters camParams = camera.getParameters();
 
         // Find a preview size that is at least the size of our IMAGE_SIZE
@@ -210,13 +210,15 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
         }
         camParams.setPictureSize(pictureSize.width, pictureSize.height);
         try {
-            camera.setPreviewDisplay(cameraPreview.getHolder());
+            camera.setPreviewDisplay(mCameraPreview.getHolder());
             camera.startPreview();
         }
         catch(IOException e){
             e.printStackTrace();
 
         }
+
+        */
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
@@ -230,6 +232,7 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
         }
     }
 
+    /*
     private SurfaceHolder.Callback surfaceHolderCallback = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
@@ -237,10 +240,8 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
                 if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     return;
                 }
-                if (camera != null) {
-                    camera.setPreviewDisplay(cameraPreview.getHolder());
-                    camera.startPreview();
-                }
+
+
             } catch (IOException e) {
                 Log.e("CAMERA SOURCE", e.getMessage());
             }
@@ -259,7 +260,7 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
         }
     };
 
-
+*/
     private Bitmap processImage(byte[] data) throws IOException {
         // Determine the width/height of the image
         int width = camera.getParameters().getPictureSize().width;
@@ -311,36 +312,31 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
     public void onResume()
     {
         super .onResume();
-        if (mGestureSensor == null)
-            mGestureSensor = new CameraGestureSensor(MainActivity.this);
-        mGestureSensor.start(mCamera);
+        setupCamera();
     }
 
-    protected void retrieveControls()
-    {
-        mCamera = (JavaCameraView)findViewById(R.id.camera);
-    }
 
     @Override
-    public void onGestureUp(CameraGestureSensor caller, long gestureLength) {
+    public void onGestureUp(CameraGestureSensor caller, final long gestureLength) {
         Log.i(TAG, "Up");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mRecyclerView.scrollBy(0, SCROLL_OFFSET);
-                Toast.makeText(MainActivity.this, "Hand Motion Up", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "gestureLength = " + gestureLength);
+                scrollByOffset(SCROLL_OFFSET, (int)gestureLength);
             }
-        });    }
+        });
+    }
 
     @Override
-    public void onGestureDown(CameraGestureSensor caller, long gestureLength) {
+    public void onGestureDown(CameraGestureSensor caller, final long gestureLength) {
         Log.i(TAG, "Down");
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mRecyclerView.scrollBy(0, -SCROLL_OFFSET);
-                Toast.makeText(MainActivity.this, "Hand Motion Down", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "gestureLength = " + gestureLength);
+                scrollByOffset(-SCROLL_OFFSET, (int)gestureLength);
             }
         });
 
@@ -353,7 +349,7 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
             @Override
             public void run() {
                 setBackgroundColor(1);
-                Toast.makeText(MainActivity.this, "Hand Motion Left", Toast.LENGTH_SHORT).show();
+
             }
         });
     }
@@ -364,7 +360,7 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MainActivity.this, "Hand Motion Right", Toast.LENGTH_SHORT).show();
+
                 setBackgroundColor(-1);
             }
         });
@@ -373,17 +369,24 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
     private void setBackgroundColor(int direction) {
         int[] rainbow = MainActivity.this.getResources().getIntArray(R.array.backgroundColors);
         currentIndex += direction;
+
+        Log.d(TAG, "rainbow.length : " + rainbow.length  + " current index : " + currentIndex);
         if (currentIndex < 0) {
-            currentIndex = rainbow.length;
+            currentIndex = rainbow.length -1;
         }
-        if (currentIndex > rainbow.length) {
+        if (currentIndex > rainbow.length -1) {
             currentIndex = 0;
         }
         int index = currentIndex % rainbow.length;
-        int firstVisiblePosition = mLayoutManager.findFirstVisibleItemPosition();
-        View v = mRecyclerView.getChildAt(firstVisiblePosition);
-        PostAdapter.PostHolder holder = (PostAdapter.PostHolder)v.getTag();
-        holder.ivPhoto.setBackgroundColor(rainbow[index]);
-        
+
+        mRecyclerView.setBackgroundColor(rainbow[index]);
+    }
+
+    private void scrollByOffset(int offset, int gestureLength) {
+        int length = (LENGTH_CAP - gestureLength);
+        if (length <1) {
+            length = 1;
+        }
+        mRecyclerView.smoothScrollBy(0, (offset*length));
     }
 }
