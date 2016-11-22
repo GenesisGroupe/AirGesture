@@ -1,1 +1,1 @@
-include ':app', ':openCVLibrary24131', 'HandWave'
+include ':app'
