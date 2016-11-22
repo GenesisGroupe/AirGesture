@@ -4,8 +4,6 @@
 //
 package org.opencv.objdetect;
 
-import java.lang.String;
-import java.util.ArrayList;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfFloat;

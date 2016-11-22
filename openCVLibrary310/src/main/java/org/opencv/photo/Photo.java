@@ -4,12 +4,12 @@
 //
 package org.opencv.photo;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.Point;
 import org.opencv.utils.Converters;
+
+import java.util.List;
 
 public class Photo {
 

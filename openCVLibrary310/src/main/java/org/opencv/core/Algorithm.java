@@ -4,8 +4,6 @@
 //
 package org.opencv.core;
 
-import java.lang.String;
-
 // C++: class Algorithm
 //javadoc: Algorithm
 public class Algorithm {

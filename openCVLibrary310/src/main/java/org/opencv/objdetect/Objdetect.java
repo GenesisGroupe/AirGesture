@@ -4,7 +4,6 @@
 //
 package org.opencv.objdetect;
 
-import java.util.ArrayList;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfRect;

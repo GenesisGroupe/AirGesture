@@ -4,7 +4,6 @@
 //
 package org.opencv.videoio;
 
-import java.lang.String;
 import org.opencv.core.Mat;
 
 // C++: class VideoCapture
