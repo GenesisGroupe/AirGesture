@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AirGesture.iml" filepath="$PROJECT_DIR$/AirGesture.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Handwave/Handwave.iml" filepath="$PROJECT_DIR$/Handwave/Handwave.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HandWave/Handwave.iml" filepath="$PROJECT_DIR$/HandWave/Handwave.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/openCVLibrary310/openCVLibrary310.iml" filepath="$PROJECT_DIR$/openCVLibrary310/openCVLibrary310.iml" />
     </modules>
