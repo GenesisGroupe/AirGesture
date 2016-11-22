@@ -2,12 +2,15 @@ package com.genesis.airgesture.adapters;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.graphics.Point;
 import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -59,13 +62,21 @@ public class PostAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         PostHolder realHolder = (PostHolder)holder;
         PhotoPost post = posts.get(position);
-
-        float width = ((PostHolder) holder).viewPost.getResources().getDimension(R.dimen.photo_width);
-        float height = ((PostHolder) holder).viewPost.getResources().getDimension(R.dimen.photo_height);
         Context context = realHolder.viewPost.getContext();
-        Picasso.with(realHolder.viewPost.getContext()).load(post.getPhotos().get(0).getOriginalSize().getUrl()).resize((int)width, (int)height).into(realHolder.ivPhoto);
-        realHolder.tvTitle.setText("title : " + post.getSourceTitle());
-        realHolder.ivPhoto.setBackgroundColor(context.getColor(R.color.colorPrimary));
+
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+
+
+        Point size = new Point();
+        display.getSize(size);
+
+        int width = size.x;
+        int height =(int) context.getResources().getDimension(R.dimen.photo_height);
+
+        Picasso.with(context).load(post.getPhotos().get(0).getOriginalSize().getUrl()).resize(width, height).into(realHolder.ivPhoto);
+        realHolder.tvTitle.setText("title : " + position);
+
 
     }
 

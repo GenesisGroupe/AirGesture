@@ -659,6 +659,11 @@ public class CameraGestureSensor extends ClickSensor implements CameraBridgeView
 		private Direction getGestureDirection(double gestureLength)
 		{
 			Direction movementDirection = Direction.None;
+
+			if (mEndPos == null || mStartPos == null)
+				return movementDirection;
+
+
 			
             double diffY = mEndPos.y - mStartPos.y;
             double diffX = mEndPos.x - mStartPos.x;
