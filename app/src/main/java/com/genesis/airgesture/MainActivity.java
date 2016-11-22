@@ -15,8 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.View;
+
 import android.widget.Toast;
 
 import com.genesis.airgesture.adapters.PostAdapter;
@@ -68,14 +67,6 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
                 {
 
                     if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        // No explanation needed, we can request the permission.
 
                         ActivityCompat.requestPermissions(MainActivity.this,
                                 new String[]{Manifest.permission.CAMERA},
@@ -162,63 +153,25 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
 
 
     public void setupCamera() {
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            // No explanation needed, we can request the permission.
 
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA},
                     0);
 
-
             return;
         }
-
         mGestureSensor = new CameraGestureSensor(MainActivity.this);
         mGestureSensor.addGestureListener(MainActivity.this);
         mGestureSensor.start(mCameraPreview);
+    }
 
-        /*
-        //mCameraPreview.getHolder().addCallback(surfaceHolderCallback);
-        Camera camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-        Camera.Parameters camParams = camera.getParameters();
-
-        // Find a preview size that is at least the size of our IMAGE_SIZE
-        Camera.Size previewSize = camParams.getSupportedPreviewSizes().get(0);
-        for (Camera.Size size : camParams.getSupportedPreviewSizes()) {
-            if (size.width >= IMAGE_SIZE && size.height >= IMAGE_SIZE) {
-                previewSize = size;
-                break;
-            }
+    public void stopCamera() {
+        if (mGestureSensor != null) {
+            mGestureSensor.stop();
+            mGestureSensor.removeGestureListener(MainActivity.this);
+            mGestureSensor = null;
         }
-        camParams.setPreviewSize(previewSize.width, previewSize.height);
-
-        // Try to find the closest picture size to match the preview size.
-        Camera.Size pictureSize = camParams.getSupportedPictureSizes().get(0);
-        for (Camera.Size size : camParams.getSupportedPictureSizes()) {
-            if (size.width == previewSize.width && size.height == previewSize.height) {
-                pictureSize = size;
-                break;
-            }
-        }
-        camParams.setPictureSize(pictureSize.width, pictureSize.height);
-        try {
-            camera.setPreviewDisplay(mCameraPreview.getHolder());
-            camera.startPreview();
-        }
-        catch(IOException e){
-            e.printStackTrace();
-
-        }
-
-        */
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
@@ -232,35 +185,6 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
         }
     }
 
-    /*
-    private SurfaceHolder.Callback surfaceHolderCallback = new SurfaceHolder.Callback() {
-        @Override
-        public void surfaceCreated(SurfaceHolder holder) {
-            try {
-                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-
-
-            } catch (IOException e) {
-                Log.e("CAMERA SOURCE", e.getMessage());
-            }
-        }
-
-        @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-        }
-
-        @Override
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            if (camera != null) {
-                camera.stopPreview();
-            }
-        }
-    };
-
-*/
     private Bitmap processImage(byte[] data) throws IOException {
         // Determine the width/height of the image
         int width = camera.getParameters().getPictureSize().width;
@@ -305,13 +229,14 @@ public class MainActivity extends Activity implements CameraGestureSensor.Listen
     public void onPause()
     {
         super .onPause();
-        if (mGestureSensor != null)
-            mGestureSensor.stop();
+        Log.d(TAG, "onPause");
+        stopCamera();
     }
     @Override
     public void onResume()
     {
         super .onResume();
+        Log.d(TAG, "onResume");
         setupCamera();
     }
 
