@@ -10,6 +10,7 @@
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
         android:elevation="12dp"
         card_view:cardCornerRadius="4dp"
         android:padding="5dp">

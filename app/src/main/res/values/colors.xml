@@ -4,4 +4,13 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="cardview_dark_background">#FF505050</color>
+
+
+    <array name="backgroundColors">
+        <item name="color1">#FF0000</item>
+        <item name="color2">#00FF00</item>
+        <item name="color3">#0000FF</item>
+        <item name="color4">#FF4081</item>
+        <item name="color5">#303F9F</item>
+    </array>
 </resources>

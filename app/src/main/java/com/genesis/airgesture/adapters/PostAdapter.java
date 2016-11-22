@@ -48,8 +48,10 @@ public class PostAdapter extends RecyclerView.Adapter {
                 .inflate(R.layout.photo_post_cell, parent, false);
 
         PostHolder ph = new PostHolder(v);
+        v.setBackgroundColor(v.getContext().getColor(android.R.color.transparent));
         ph.ivPhoto = (ImageView) v.findViewById(R.id.photo_post_iv);
         ph.tvTitle = (TextView)  v.findViewById(R.id.photo_post_tv_title);
+        v.setTag(ph);
         return ph;
     }
 
@@ -60,9 +62,11 @@ public class PostAdapter extends RecyclerView.Adapter {
 
         float width = ((PostHolder) holder).viewPost.getResources().getDimension(R.dimen.photo_width);
         float height = ((PostHolder) holder).viewPost.getResources().getDimension(R.dimen.photo_height);
-
+        Context context = realHolder.viewPost.getContext();
         Picasso.with(realHolder.viewPost.getContext()).load(post.getPhotos().get(0).getOriginalSize().getUrl()).resize((int)width, (int)height).into(realHolder.ivPhoto);
         realHolder.tvTitle.setText("title : " + post.getSourceTitle());
+        realHolder.ivPhoto.setBackgroundColor(context.getColor(R.color.colorPrimary));
+
     }
 
     @Override

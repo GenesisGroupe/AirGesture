@@ -21,6 +21,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Toast;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -40,11 +41,14 @@ import org.opencv.android.OpenCVLoader;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import edu.washington.cs.touchfreelibrary.sensors.CameraGestureSensor;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements CameraGestureSensor.Listener{
 
     private static int IMAGE_SIZE = 1024;
+    private static int SCROLL_OFFSET = 1000;
+
     public static  String consumer_key = "KLwOfrGQ80ZBauTPmLYbjoHAnrAwFJAjfs8Z0QjlO6qf5WpBAA";
     public static  String consumer_secret = "cCTqMq8lY69jLLvNIY6n5IWFQb8nD2hbEJA7AG8DdPQGfekgNW";
     public static  String token = "BmUdLjlMriPaA8fFRYkMiMj9cUWy58NjQ6IZGvp5YXMH1Cv73Z";
@@ -57,9 +61,7 @@ public class MainActivity extends Activity {
     private Camera camera;
     private Handler mHandler;
 
-import edu.washington.cs.touchfreelibrary.sensors.CameraGestureSensor;
-
-public class MainActivity extends AppCompatActivity implements CameraGestureSensor.Listener {
+    private int currentIndex = 0;
 
     private static final String TAG = "MainActivity";
     CameraGestureSensor mGestureSensor = null;
@@ -72,6 +74,25 @@ public class MainActivity extends AppCompatActivity implements CameraGestureSens
             {
                 case LoaderCallbackInterface.SUCCESS:
                 {
+
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        // No explanation needed, we can request the permission.
+
+                        ActivityCompat.requestPermissions(MainActivity.this,
+                                new String[]{Manifest.permission.CAMERA},
+                                0);
+
+
+                        return;
+                    }
+
                     mGestureSensor = new CameraGestureSensor(MainActivity.this);
                     CameraGestureSensor.loadLibrary();
                     mGestureSensor.addGestureListener(MainActivity.this);
@@ -79,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements CameraGestureSens
                 }
                 break;
                 default:
+                    loadOpenCV();
                     Log.i(TAG, "Some other result than success");
                     break;
             }
@@ -89,7 +111,9 @@ public class MainActivity extends AppCompatActivity implements CameraGestureSens
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.CAMERA},
+                0);
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
         // use this setting to improve performance if you know that changes
@@ -101,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements CameraGestureSens
 
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        cameraPreview = (SurfaceView) findViewById(R.id.camera_preview);
+        cameraPreview = (SurfaceView) findViewById(R.id.camera);
         setupCamera();
         mHandler = new Handler();
 
@@ -141,13 +165,6 @@ public class MainActivity extends AppCompatActivity implements CameraGestureSens
     }
 
 
-    private Runnable scrollRunnable = new Runnable() {
-        @Override
-        public void run() {
-            mRecyclerView.scrollBy(0, 100);
-            mHandler.postDelayed(this, 100);
-        }
-    };
 
 
     public void setupCamera() {
@@ -220,8 +237,10 @@ public class MainActivity extends AppCompatActivity implements CameraGestureSens
                 if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     return;
                 }
-                camera.setPreviewDisplay(cameraPreview.getHolder());
-                camera.startPreview();
+                if (camera != null) {
+                    camera.setPreviewDisplay(cameraPreview.getHolder());
+                    camera.startPreview();
+                }
             } catch (IOException e) {
                 Log.e("CAMERA SOURCE", e.getMessage());
             }
@@ -308,6 +327,7 @@ public class MainActivity extends AppCompatActivity implements CameraGestureSens
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                mRecyclerView.scrollBy(0, SCROLL_OFFSET);
                 Toast.makeText(MainActivity.this, "Hand Motion Up", Toast.LENGTH_SHORT).show();
             }
         });    }
@@ -315,9 +335,11 @@ public class MainActivity extends AppCompatActivity implements CameraGestureSens
     @Override
     public void onGestureDown(CameraGestureSensor caller, long gestureLength) {
         Log.i(TAG, "Down");
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                mRecyclerView.scrollBy(0, -SCROLL_OFFSET);
                 Toast.makeText(MainActivity.this, "Hand Motion Down", Toast.LENGTH_SHORT).show();
             }
         });
@@ -330,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements CameraGestureSens
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                setBackgroundColor(1);
                 Toast.makeText(MainActivity.this, "Hand Motion Left", Toast.LENGTH_SHORT).show();
             }
         });
@@ -342,7 +365,25 @@ public class MainActivity extends AppCompatActivity implements CameraGestureSens
             @Override
             public void run() {
                 Toast.makeText(MainActivity.this, "Hand Motion Right", Toast.LENGTH_SHORT).show();
+                setBackgroundColor(-1);
             }
         });
+    }
+
+    private void setBackgroundColor(int direction) {
+        int[] rainbow = MainActivity.this.getResources().getIntArray(R.array.backgroundColors);
+        currentIndex += direction;
+        if (currentIndex < 0) {
+            currentIndex = rainbow.length;
+        }
+        if (currentIndex > rainbow.length) {
+            currentIndex = 0;
+        }
+        int index = currentIndex % rainbow.length;
+        int firstVisiblePosition = mLayoutManager.findFirstVisibleItemPosition();
+        View v = mRecyclerView.getChildAt(firstVisiblePosition);
+        PostAdapter.PostHolder holder = (PostAdapter.PostHolder)v.getTag();
+        holder.ivPhoto.setBackgroundColor(rainbow[index]);
+        
     }
 }

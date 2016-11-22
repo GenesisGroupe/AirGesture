@@ -21,22 +21,19 @@
     <SurfaceView
         android:id="@+id/camera_preview"
         android:layout_weight="1"
+        android:visibility="gone"
         android:background="@android:color/black"
         android:layout_width="match_parent"
         android:layout_height="0dp"/>
     <!-- /End Camera Preview -->
 
-</LinearLayout>
     <org.opencv.android.JavaCameraView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone"
         android:id="@+id/camera"
         />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
 
-</RelativeLayout>
+</LinearLayout>
